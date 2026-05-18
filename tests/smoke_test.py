@@ -93,6 +93,35 @@ def main():
         admin = request_json(f"http://127.0.0.1:8765/api/request?token={created['requestToken']}")
         assert len(admin["quotes"]) == 4
         assert len(admin["notifications"]) == 1
+
+        boundary, body = multipart(
+            {
+                "projectName": "수기 입력 테스트",
+                "dueDate": "2026-06-30",
+                "vendors": "수기업체, 담당자, manual@example.com",
+                "memo": "수기 입력 테스트",
+                "manualParts": json.dumps(
+                    [
+                        {"name": "노트북", "quantity": 2, "unitPrice": 1500000},
+                        {"name": "RAM", "quantity": 4, "unitPrice": 80000},
+                    ],
+                    ensure_ascii=False,
+                ),
+            },
+            "file",
+            ROOT / "samples" / "sample_parts.xlsx",
+        )
+        manual_body = body.split(b'Content-Disposition: form-data; name="file";')[0]
+        manual_body += f"--{boundary}--\r\n".encode("utf-8")
+        manual_req = urllib.request.Request(
+            "http://127.0.0.1:8765/api/requests",
+            data=manual_body,
+            headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
+            method="POST",
+        )
+        with urllib.request.urlopen(manual_req) as response:
+            manual_created = json.loads(response.read().decode("utf-8"))
+        assert manual_created["partCount"] == 2
         print("smoke test passed")
     finally:
         httpd.shutdown()

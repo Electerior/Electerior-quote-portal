@@ -59,6 +59,7 @@ def init_db():
               name text not null,
               spec text,
               quantity integer not null default 1,
+              baseline_unit_price real,
               unit text,
               note text
             );
@@ -98,6 +99,12 @@ def init_db():
             );
             """
         )
+        part_columns = {
+            row["name"]
+            for row in conn.execute("pragma table_info(parts)")
+        }
+        if "baseline_unit_price" not in part_columns:
+            conn.execute("alter table parts add column baseline_unit_price real")
 
 
 def row_dict(row):
@@ -136,6 +143,7 @@ def parse_excel(path):
     col_name = find_col(["품목", "부품명", "제품명", "name", "part", "item"])
     col_spec = find_col(["사양", "규격", "spec", "description"])
     col_qty = find_col(["수량", "qty", "quantity"])
+    col_unit_price = find_col(["단가", "unit price", "unit_price", "price"])
     col_unit = find_col(["단위", "unit"])
     col_note = find_col(["비고", "메모", "note", "remark"])
 
@@ -163,12 +171,19 @@ def parse_excel(path):
         except ValueError:
             quantity = 1
 
+        unit_price_raw = value(col_unit_price).replace(",", "")
+        try:
+            baseline_unit_price = float(unit_price_raw) if unit_price_raw else None
+        except ValueError:
+            baseline_unit_price = None
+
         parts.append(
             {
                 "category": value(col_category),
                 "name": name or spec,
                 "spec": spec,
                 "quantity": max(quantity, 1),
+                "baseline_unit_price": baseline_unit_price,
                 "unit": value(col_unit) or "EA",
                 "note": value(col_note),
             }
@@ -401,6 +416,7 @@ class AppHandler(BaseHTTPRequestHandler):
         due_date = field("dueDate")
         memo = field("memo")
         vendors_raw = field("vendors")
+        manual_parts_raw = field("manualParts", "[]")
         if not project_name:
             return self.send_json({"error": "사업명을 입력해주세요."}, 400)
 
@@ -409,18 +425,50 @@ class AppHandler(BaseHTTPRequestHandler):
             if item.get_param("name", header="content-disposition") == "file":
                 file_part = item
                 break
-        if file_part is None or not file_part.get_filename():
-            return self.send_json({"error": "부품 리스트 Excel 파일이 필요합니다."}, 400)
+        saved_name = ""
+        parts = []
+        if file_part is not None and file_part.get_filename():
+            filename = Path(file_part.get_filename()).name
+            saved_name = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{secrets.token_hex(4)}_{filename}"
+            saved_path = UPLOAD_DIR / saved_name
+            saved_path.write_bytes(file_part.get_payload(decode=True))
 
-        filename = Path(file_part.get_filename()).name
-        saved_name = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{secrets.token_hex(4)}_{filename}"
-        saved_path = UPLOAD_DIR / saved_name
-        saved_path.write_bytes(file_part.get_payload(decode=True))
-
-        try:
-            parts = parse_excel(saved_path)
-        except Exception as exc:
-            return self.send_json({"error": str(exc)}, 400)
+            try:
+                parts = parse_excel(saved_path)
+            except Exception as exc:
+                return self.send_json({"error": str(exc)}, 400)
+        else:
+            try:
+                manual_parts = json.loads(manual_parts_raw)
+            except json.JSONDecodeError:
+                manual_parts = []
+            for part in manual_parts:
+                name = str(part.get("name", "")).strip()
+                if not name:
+                    continue
+                quantity_raw = str(part.get("quantity", "1")).replace(",", "").strip()
+                unit_price_raw = str(part.get("unitPrice", "")).replace(",", "").strip()
+                try:
+                    quantity = int(float(quantity_raw)) if quantity_raw else 1
+                except ValueError:
+                    quantity = 1
+                try:
+                    unit_price = float(unit_price_raw) if unit_price_raw else None
+                except ValueError:
+                    unit_price = None
+                parts.append(
+                    {
+                        "category": "",
+                        "name": name,
+                        "spec": "",
+                        "quantity": max(quantity, 1),
+                        "baseline_unit_price": unit_price,
+                        "unit": "EA",
+                        "note": "",
+                    }
+                )
+            if not parts:
+                return self.send_json({"error": "Excel 파일을 올리거나 수기 부품을 1개 이상 입력해주세요."}, 400)
 
         vendors = []
         for line in vendors_raw.splitlines():
@@ -451,8 +499,9 @@ class AppHandler(BaseHTTPRequestHandler):
             for part in parts:
                 conn.execute(
                     """
-                    insert into parts (request_id, category, name, spec, quantity, unit, note)
-                    values (?, ?, ?, ?, ?, ?, ?)
+                    insert into parts
+                      (request_id, category, name, spec, quantity, baseline_unit_price, unit, note)
+                    values (?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         request_id,
@@ -460,6 +509,7 @@ class AppHandler(BaseHTTPRequestHandler):
                         part["name"],
                         part["spec"],
                         part["quantity"],
+                        part.get("baseline_unit_price"),
                         part["unit"],
                         part["note"],
                     ),

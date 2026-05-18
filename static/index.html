@@ -7,11 +7,11 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <main class="shell">
+    <main class="wide-shell">
       <section class="topbar">
         <div>
           <h1>부품 견적 요청</h1>
-          <p>Excel 부품 리스트를 올리고 업체별 견적 입력 링크를 생성합니다.</p>
+          <p>사업명과 마감일을 입력하고, 부품은 수기로 적거나 Excel로 올릴 수 있습니다.</p>
         </div>
         <a class="ghost" href="/requests.html">요청 목록</a>
       </section>
@@ -20,7 +20,7 @@
         <form id="requestForm" class="form">
           <label>
             <span>사업명</span>
-            <input name="projectName" required placeholder="예: 2026 서버 증설 사업" />
+            <input name="projectName" required placeholder="예: 6G 표준 개발용 노트북 외 2건" />
           </label>
 
           <label>
@@ -28,9 +28,41 @@
             <input name="dueDate" type="date" />
           </label>
 
+          <div class="full-row">
+            <div class="section-head">
+              <div>
+                <h2>부품 리스트</h2>
+                <p>수기로 입력하거나 Excel 파일을 선택하세요. 수기 입력은 품목, 수량, 단가, 합계를 바로 확인할 수 있습니다.</p>
+              </div>
+              <button class="ghost" type="button" id="addPartRow">행 추가</button>
+            </div>
+
+            <div class="table-wrap manual-table-wrap">
+              <table id="manualPartsTable" class="manual-parts-table">
+                <thead>
+                  <tr>
+                    <th>품목</th>
+                    <th class="right">수량</th>
+                    <th class="right">단가</th>
+                    <th class="right">합계</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                  <tr class="total-row">
+                    <td colspan="3">총합계</td>
+                    <td class="right" id="manualGrandTotal">0</td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
           <label>
             <span>부품 리스트 Excel</span>
-            <input name="file" type="file" accept=".xlsx,.xlsm" required />
+            <input name="file" type="file" accept=".xlsx,.xlsm" />
           </label>
 
           <label>
@@ -38,7 +70,7 @@
             <textarea
               name="vendors"
               required
-              rows="6"
+              rows="5"
               placeholder="업체명, 담당자, 이메일&#10;ABC컴퓨터, 홍길동, hong@example.com&#10;테크유통, 김영희, kim@example.com"
             ></textarea>
           </label>
@@ -48,6 +80,7 @@
             <textarea name="memo" rows="4" placeholder="납기 조건, 정품/병행수입 여부, 보증 조건 등"></textarea>
           </label>
 
+          <input type="hidden" name="manualParts" id="manualParts" />
           <button class="primary" type="submit">견적 링크 생성</button>
         </form>
       </section>

@@ -1,8 +1,27 @@
 const form = document.querySelector("#requestForm");
 const result = document.querySelector("#result");
+const manualBody = document.querySelector("#manualPartsTable tbody");
+const manualPartsInput = document.querySelector("#manualParts");
+const grandTotal = document.querySelector("#manualGrandTotal");
+
+document.querySelector("#addPartRow").addEventListener("click", () => addPartRow());
+
+addPartRow();
+addPartRow();
+addPartRow();
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+  const manualParts = collectManualParts();
+  manualPartsInput.value = JSON.stringify(manualParts);
+
+  const hasFile = Boolean(form.elements.file.files[0]);
+  if (!hasFile && manualParts.length === 0) {
+    result.classList.remove("hidden");
+    result.innerHTML = '<p class="badge warn">Excel 파일을 올리거나 수기 부품을 1개 이상 입력해주세요.</p>';
+    return;
+  }
+
   result.classList.remove("hidden");
   result.innerHTML = '<p class="muted">견적 요청을 만들고 있습니다.</p>';
 
@@ -51,6 +70,65 @@ form.addEventListener("submit", async (event) => {
     <div class="list">${links}</div>
   `;
 });
+
+function addPartRow(part = {}) {
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td><input name="partName" placeholder="예: 노트북, CPU, RAM" value="${escapeAttr(part.name || "")}" /></td>
+    <td><input class="number-input" name="partQty" inputmode="numeric" value="${escapeAttr(part.quantity || "")}" /></td>
+    <td><input class="number-input" name="partUnitPrice" inputmode="numeric" value="${escapeAttr(formatInputPrice(part.unitPrice || ""))}" /></td>
+    <td class="right row-total">0</td>
+    <td class="right"><button class="icon-button" type="button" aria-label="행 삭제">×</button></td>
+  `;
+  row.querySelectorAll("input").forEach((input) => {
+    input.addEventListener("input", () => {
+      if (input.name !== "partName") input.value = formatInputPrice(input.value);
+      updateManualTotals();
+    });
+  });
+  row.querySelector("button").addEventListener("click", () => {
+    row.remove();
+    if (!manualBody.children.length) addPartRow();
+    updateManualTotals();
+  });
+  manualBody.appendChild(row);
+  updateManualTotals();
+}
+
+function collectManualParts() {
+  return [...manualBody.querySelectorAll("tr")]
+    .map((row) => ({
+      name: row.querySelector('[name="partName"]').value.trim(),
+      quantity: parseNumber(row.querySelector('[name="partQty"]').value) || 1,
+      unitPrice: parseNumber(row.querySelector('[name="partUnitPrice"]').value) || "",
+    }))
+    .filter((part) => part.name);
+}
+
+function updateManualTotals() {
+  let total = 0;
+  manualBody.querySelectorAll("tr").forEach((row) => {
+    const qty = parseNumber(row.querySelector('[name="partQty"]').value) || 0;
+    const unitPrice = parseNumber(row.querySelector('[name="partUnitPrice"]').value) || 0;
+    const rowTotal = qty * unitPrice;
+    total += rowTotal;
+    row.querySelector(".row-total").textContent = formatMoney(rowTotal);
+  });
+  grandTotal.textContent = formatMoney(total);
+}
+
+function parseNumber(value) {
+  return Number(String(value).replace(/[^\d.]/g, ""));
+}
+
+function formatInputPrice(value) {
+  const digits = String(value).replace(/[^\d]/g, "");
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function formatMoney(value) {
+  return Number(value || 0).toLocaleString("ko-KR");
+}
 
 function copyText(text) {
   navigator.clipboard.writeText(text);

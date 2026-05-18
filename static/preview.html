@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>견적 포털 미리보기</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="topbar">
+        <div>
+          <h1>부품 견적 요청</h1>
+          <p>Excel 부품 리스트를 올리고 업체별 견적 입력 링크를 생성합니다.</p>
+        </div>
+        <a class="ghost" href="#">요청 목록</a>
+      </section>
+      <section class="panel">
+        <form class="form">
+          <label>
+            <span>사업명</span>
+            <input value="2026 서버 증설 사업" />
+          </label>
+          <label>
+            <span>견적 마감일</span>
+            <input value="2026-06-30" />
+          </label>
+          <label>
+            <span>부품 리스트 Excel</span>
+            <input value="sample_parts.xlsx" />
+          </label>
+          <label>
+            <span>업체 목록</span>
+            <textarea rows="5">ABC컴퓨터, 홍길동, hong@example.com
+테크유통, 김영희, kim@example.com
+서버마트, 박민수, park@example.com</textarea>
+          </label>
+          <label>
+            <span>요청 메모</span>
+            <textarea rows="3">정품 기준, 납기 가능일과 보증 조건을 함께 기재해주세요.</textarea>
+          </label>
+          <button class="primary" type="button">견적 링크 생성</button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

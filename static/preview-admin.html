@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>견적 비교 미리보기</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="wide-shell">
+      <section class="topbar">
+        <div>
+          <h1>2026 서버 증설 사업</h1>
+          <p>마감일: 2026-06-30 · 부품 4개 · 업체 3개</p>
+        </div>
+        <div class="actions">
+          <span class="muted">자동 갱신됨 · 오전 9:55:12</span>
+          <a class="ghost" href="#">요청 목록</a>
+        </div>
+      </section>
+      <section class="panel">
+        <div class="section-head">
+          <h2>업체 링크</h2>
+          <button class="ghost">전체 링크 복사</button>
+        </div>
+        <div class="list">
+          <div class="item">
+            <div class="item-title"><span>ABC컴퓨터</span><span class="badge done">제출 완료</span></div>
+            <div class="muted">홍길동 hong@example.com</div>
+            <div class="copy-row"><input readonly value="http://127.0.0.1:8000/vendor.html?token=abc..." /><button>복사</button></div>
+          </div>
+          <div class="item">
+            <div class="item-title"><span>테크유통</span><span class="badge">대기</span></div>
+            <div class="muted">김영희 kim@example.com</div>
+            <div class="copy-row"><input readonly value="http://127.0.0.1:8000/vendor.html?token=tech..." /><button>복사</button></div>
+          </div>
+        </div>
+      </section>
+      <section class="panel">
+        <h2>견적 비교표</h2>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>구분</th><th>부품명</th><th>사양</th><th class="right">수량</th>
+              <th>ABC컴퓨터 단가</th><th>테크유통 단가</th><th>서버마트 단가</th>
+            </tr>
+            <tr><td>CPU</td><td>Intel Xeon</td><td>Gold 6430 또는 동급</td><td class="right">2</td><td>2,450,000</td><td></td><td>2,380,000</td></tr>
+            <tr><td>RAM</td><td>DDR5 ECC RDIMM</td><td>64GB</td><td class="right">16</td><td>320,000</td><td></td><td>310,000</td></tr>
+            <tr><td>SSD</td><td>NVMe SSD</td><td>3.84TB Enterprise</td><td class="right">4</td><td>690,000</td><td></td><td>720,000</td></tr>
+            <tr><td>GPU</td><td>NVIDIA GPU</td><td>L40S 또는 동급</td><td class="right">2</td><td>9,800,000</td><td></td><td>9,650,000</td></tr>
+            <tr class="total-row"><td colspan="4">총액</td><td>32,380,000</td><td>0</td><td>31,860,000</td></tr>
+          </table>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

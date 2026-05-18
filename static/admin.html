@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>견적 비교</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="wide-shell">
+      <section class="topbar">
+        <div>
+          <h1 id="title">견적 비교</h1>
+          <p id="summary"></p>
+        </div>
+        <div class="actions">
+          <span id="refreshStatus" class="muted">자동 갱신 대기</span>
+          <a class="ghost" href="/requests.html">요청 목록</a>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-head">
+          <h2>업체 링크</h2>
+          <button class="ghost" type="button" id="copyAllLinks">전체 링크 복사</button>
+        </div>
+        <div id="vendorLinks" class="list"></div>
+      </section>
+
+      <section class="panel">
+        <h2>견적 비교표</h2>
+        <div class="table-wrap">
+          <table id="compareTable"></table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>알림 기록</h2>
+        <div id="notifications" class="list"></div>
+      </section>
+    </main>
+    <script src="/admin.js"></script>
+  </body>
+</html>

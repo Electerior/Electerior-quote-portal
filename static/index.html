@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>부품 견적 요청</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="topbar">
+        <div>
+          <h1>부품 견적 요청</h1>
+          <p>Excel 부품 리스트를 올리고 업체별 견적 입력 링크를 생성합니다.</p>
+        </div>
+        <a class="ghost" href="/requests.html">요청 목록</a>
+      </section>
+
+      <section class="panel">
+        <form id="requestForm" class="form">
+          <label>
+            <span>사업명</span>
+            <input name="projectName" required placeholder="예: 2026 서버 증설 사업" />
+          </label>
+
+          <label>
+            <span>견적 마감일</span>
+            <input name="dueDate" type="date" />
+          </label>
+
+          <label>
+            <span>부품 리스트 Excel</span>
+            <input name="file" type="file" accept=".xlsx,.xlsm" required />
+          </label>
+
+          <label>
+            <span>업체 목록</span>
+            <textarea
+              name="vendors"
+              required
+              rows="6"
+              placeholder="업체명, 담당자, 이메일&#10;ABC컴퓨터, 홍길동, hong@example.com&#10;테크유통, 김영희, kim@example.com"
+            ></textarea>
+          </label>
+
+          <label>
+            <span>요청 메모</span>
+            <textarea name="memo" rows="4" placeholder="납기 조건, 정품/병행수입 여부, 보증 조건 등"></textarea>
+          </label>
+
+          <button class="primary" type="submit">견적 링크 생성</button>
+        </form>
+      </section>
+
+      <section id="result" class="panel hidden"></section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

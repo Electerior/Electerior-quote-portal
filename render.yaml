@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: quote-portal
+    runtime: python
+    plan: starter
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    envVars:
+      - key: QUOTE_DATA_DIR
+        value: /var/data
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    disk:
+      name: quote-data
+      mountPath: /var/data
+      sizeGB: 1

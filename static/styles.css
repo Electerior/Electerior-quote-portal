@@ -99,6 +99,10 @@ p,
   gap: 18px;
 }
 
+.full-row {
+  grid-column: 1 / -1;
+}
+
 label {
   display: grid;
   gap: 7px;
@@ -246,6 +250,34 @@ th {
 td input {
   min-width: 120px;
   padding: 8px;
+}
+
+.manual-table-wrap {
+  margin-top: 8px;
+}
+
+.manual-parts-table {
+  min-width: 760px;
+}
+
+.manual-parts-table th:first-child,
+.manual-parts-table td:first-child {
+  width: 45%;
+}
+
+.number-input {
+  text-align: right;
+}
+
+.icon-button {
+  min-width: 36px;
+  min-height: 36px;
+  padding: 6px;
+  border-color: var(--line);
+  background: #fff;
+  color: #516070;
+  font-size: 20px;
+  line-height: 1;
 }
 
 .price-input {

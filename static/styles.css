@@ -340,6 +340,39 @@ td input {
   min-width: 160px;
 }
 
+.portal-login {
+  max-width: 680px;
+}
+
+.login-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.login-form .primary {
+  grid-column: auto;
+  min-width: 140px;
+}
+
+.project-item {
+  display: grid;
+  gap: 12px;
+}
+
+.project-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  color: var(--muted);
+}
+
+.project-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .right {
   text-align: right;
 }
@@ -365,6 +398,10 @@ td input {
   }
 
   .vendor-card {
+    grid-template-columns: 1fr;
+  }
+
+  .login-form {
     grid-template-columns: 1fr;
   }
 

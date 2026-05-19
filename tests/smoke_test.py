@@ -99,6 +99,9 @@ def main():
         admin = request_json(f"http://127.0.0.1:8765/api/request?token={created['requestToken']}")
         assert len(admin["quotes"]) == 4
         assert len(admin["notifications"]) == 1
+        portal = request_json("http://127.0.0.1:8765/api/vendor-projects?email=hong@example.com")
+        assert len(portal["projects"]) >= 1
+        assert portal["projects"][0]["vendor_token"]
 
         boundary, body = multipart(
             {

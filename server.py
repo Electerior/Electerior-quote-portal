@@ -372,6 +372,42 @@ class AppHandler(BaseHTTPRequestHandler):
                 }
             )
 
+        if path == "/api/vendor-projects":
+            email = query.get("email", [""])[0].strip().lower()
+            if not email:
+                return self.send_json({"error": "이메일을 입력해주세요."}, 400)
+            with db() as conn:
+                projects = [
+                    dict(row)
+                    for row in conn.execute(
+                        """
+                        select
+                          r.project_name,
+                          r.due_date,
+                          r.created_at,
+                          v.company_name,
+                          v.contact_name,
+                          v.contact_email,
+                          v.status,
+                          v.submitted_at,
+                          v.token as vendor_token,
+                          (select count(*) from parts p where p.request_id = r.id) as part_count,
+                          coalesce((
+                            select sum(coalesce(q.unit_price, 0) * p.quantity)
+                            from quote_lines q
+                            join parts p on p.id = q.part_id
+                            where q.vendor_id = v.id
+                          ), 0) as quote_total
+                        from vendors v
+                        join requests r on r.id = v.request_id
+                        where lower(v.contact_email) = ?
+                        order by r.created_at desc
+                        """,
+                        (email,),
+                    )
+                ]
+            return self.send_json({"projects": projects})
+
         if path == "/api/vendor":
             token = query.get("token", [""])[0]
             with db() as conn:

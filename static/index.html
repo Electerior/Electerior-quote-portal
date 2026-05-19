@@ -3,90 +3,41 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>부품 견적 요청</title>
+    <title>업체 견적 포털</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <main class="wide-shell">
       <section class="topbar">
         <div>
-          <h1>부품 견적 요청</h1>
-          <p>사업명과 마감일을 입력하고, 부품은 수기로 적거나 Excel로 올릴 수 있습니다.</p>
+          <h1>업체 견적 포털</h1>
+          <p>진행 중인 견적 요청과 제출한 견적을 확인합니다.</p>
         </div>
-        <a class="ghost" href="/requests.html">요청 목록</a>
+        <a class="ghost" href="/manager.html">담당자 화면</a>
       </section>
 
-      <section class="panel">
-        <form id="requestForm" class="form">
+      <section class="panel portal-login" id="loginPanel">
+        <h2>로그인</h2>
+        <form id="vendorLoginForm" class="login-form">
           <label>
-            <span>사업명</span>
-            <input name="projectName" required placeholder="예: 6G 표준 개발용 노트북 외 2건" />
+            <span>업체 이메일</span>
+            <input name="email" type="email" required placeholder="예: hong@example.com" />
           </label>
-
-          <label>
-            <span>견적 마감일</span>
-            <input name="dueDate" type="date" />
-          </label>
-
-          <div class="full-row">
-            <div class="section-head">
-              <div>
-                <h2>부품 리스트</h2>
-                <p>수기로 입력하거나 Excel 파일을 선택하세요. 수기 입력은 품목, 수량, 단가, 합계를 바로 확인할 수 있습니다.</p>
-              </div>
-              <button class="ghost" type="button" id="addPartRow">행 추가</button>
-            </div>
-
-            <div class="table-wrap manual-table-wrap">
-              <table id="manualPartsTable" class="manual-parts-table">
-                <thead>
-                  <tr>
-                    <th>품목</th>
-                    <th class="right">수량</th>
-                    <th class="right">단가</th>
-                    <th class="right">합계</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-                <tfoot>
-                  <tr class="total-row">
-                    <td colspan="3">총합계</td>
-                    <td class="right" id="manualGrandTotal">0</td>
-                    <td></td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-          </div>
-
-          <label>
-            <span>부품 리스트 Excel</span>
-            <input name="file" type="file" accept=".xlsx,.xlsm" />
-          </label>
-
-          <label>
-            <span>업체 목록</span>
-            <textarea
-              name="vendors"
-              required
-              rows="5"
-              placeholder="업체명, 담당자, 이메일&#10;ABC컴퓨터, 홍길동, hong@example.com&#10;테크유통, 김영희, kim@example.com"
-            ></textarea>
-          </label>
-
-          <label>
-            <span>요청 메모</span>
-            <textarea name="memo" rows="4" placeholder="납기 조건, 정품/병행수입 여부, 보증 조건 등"></textarea>
-          </label>
-
-          <input type="hidden" name="manualParts" id="manualParts" />
-          <button class="primary" type="submit">견적 링크 생성</button>
+          <button class="primary" type="submit">로그인</button>
         </form>
       </section>
 
-      <section id="result" class="panel hidden"></section>
+      <section class="panel hidden" id="projectPanel">
+        <div class="section-head">
+          <div>
+            <h2>진행 프로젝트</h2>
+            <p id="loginSummary"></p>
+          </div>
+          <button class="ghost" type="button" id="logoutButton">로그아웃</button>
+        </div>
+        <div id="vendorProjectList" class="list"></div>
+      </section>
     </main>
-    <script src="/app.js"></script>
+    <script src="/portal.js"></script>
   </body>
 </html>

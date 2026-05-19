@@ -78,17 +78,23 @@ def main():
 
         submitted = request_json(
             "http://127.0.0.1:8765/api/quote",
-            {"token": vendor_token, "lines": lines},
+            {"token": vendor_token, "lines": lines, "finalSubmit": False},
             {"Content-Type": "application/json"},
         )
         assert submitted["ok"] is True
+        assert submitted["status"] == "draft"
 
         updated = request_json(
             "http://127.0.0.1:8765/api/quote",
-            {"token": vendor_token, "lines": [{"partId": part["id"], "unitPrice": "1200"} for part in vendor["parts"]]},
+            {
+                "token": vendor_token,
+                "lines": [{"partId": part["id"], "unitPrice": "1200"} for part in vendor["parts"]],
+                "finalSubmit": True,
+            },
             {"Content-Type": "application/json"},
         )
         assert updated["ok"] is True
+        assert updated["status"] == "submitted"
 
         admin = request_json(f"http://127.0.0.1:8765/api/request?token={created['requestToken']}")
         assert len(admin["quotes"]) == 4

@@ -553,6 +553,7 @@ class AppHandler(BaseHTTPRequestHandler):
         payload = self.read_json()
         token = payload.get("token", "")
         lines = payload.get("lines", [])
+        final_submit = bool(payload.get("finalSubmit"))
         has_price = False
         with db() as conn:
             vendor = row_dict(conn.execute("select * from vendors where token = ?", (token,)).fetchone())
@@ -593,16 +594,21 @@ class AppHandler(BaseHTTPRequestHandler):
                     ),
                 )
             submitted_at = now_iso()
-            if has_price:
+            if has_price and final_submit:
                 conn.execute(
                     "update vendors set status = 'submitted', submitted_at = ? where id = ?",
                     (submitted_at, vendor["id"]),
                 )
+            elif has_price and not was_submitted:
+                conn.execute(
+                    "update vendors set status = 'draft' where id = ?",
+                    (vendor["id"],),
+                )
             vendor = row_dict(conn.execute("select * from vendors where id = ?", (vendor["id"],)).fetchone())
 
-        if has_price and not was_submitted:
+        if has_price and final_submit and not was_submitted:
             send_notification(request, vendor)
-        return self.send_json({"ok": True, "submittedAt": submitted_at})
+        return self.send_json({"ok": True, "submittedAt": vendor["submitted_at"], "status": vendor["status"]})
 
 
 def main():
